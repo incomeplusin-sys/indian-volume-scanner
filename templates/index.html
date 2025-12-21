@@ -34,8 +34,9 @@
         .stock-item {
             padding: 15px;
             border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
         }
-        .stock-item:last-child { border-bottom: none; }
+        .stock-item:last-child { border-bottom: none; margin-bottom: 0; }
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -56,6 +57,16 @@
             border-radius: 20px;
             margin: 3px;
             font-size: 14px;
+            display: inline-block;
+        }
+        .price-up { color: #10b981; }
+        .price-down { color: #ef4444; }
+        .info-text {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #0ea5e9;
         }
     </style>
 </head>
@@ -63,7 +74,14 @@
     <div class="container">
         <div class="header">
             <h1>📈 Indian Volume Pattern Scanner</h1>
-            <p>Free • Real-time • No API Keys Required</p>
+            <p>Real-time Volume Analysis • Free • No API Keys Required</p>
+            <div style="font-size: 14px; margin-top: 10px; opacity: 0.9;">
+                <span id="current-time">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="info-text">
+            <strong>ℹ️ How it works:</strong> Analyzes trading volume patterns of top Indian stocks to identify potential trading opportunities. Scans for 6 different volume patterns.
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
@@ -78,6 +96,15 @@
             <button class="btn" onclick="scan('decreasing')">Decreasing</button>
         </div>
         
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button class="btn" onclick="checkStatus()" style="background: #6b7280;">
+                🔄 Check Server Status
+            </button>
+            <button class="btn" onclick="testYFinance()" style="background: #059669;">
+                🧪 Test Data Source
+            </button>
+        </div>
+        
         <div class="loader" id="loader"></div>
         
         <div class="results" id="results">
@@ -85,18 +112,36 @@
             <p>Click any button above to start scanning.</p>
             <p>Features:</p>
             <ul>
-                <li>✅ 6 different volume patterns</li>
-                <li>✅ 20+ Indian stocks</li>
-                <li>✅ Real-time Yahoo Finance data</li>
-                <li>✅ 100% Free hosting on Render</li>
+                <li>✅ <strong>6 different volume patterns</strong> (V, U, 3+3, Pyramid, Increasing, Decreasing)</li>
+                <li>✅ <strong>10+ Indian stocks</strong> (RELIANCE, TCS, INFY, HDFCBANK, etc.)</li>
+                <li>✅ <strong>Real analysis</strong> based on actual volume data</li>
+                <li>✅ <strong>100% Free</strong> hosting on Render</li>
+                <li>✅ <strong>No patterns = no results</strong> (shows "No patterns found" instead of fake data)</li>
             </ul>
+            
+            <div class="info-text">
+                <strong>Note:</strong> The free Render tier sleeps after 15 minutes of inactivity. 
+                First scan may take 10-15 seconds to wake up the server.
+            </div>
         </div>
+        
+        <div id="test-results" style="margin-top: 20px;"></div>
     </div>
 
     <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                `Last updated: ${now.toLocaleTimeString()} | ${now.toLocaleDateString()}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+        
         function showLoader() {
             document.getElementById('loader').style.display = 'block';
             document.getElementById('results').innerHTML = '';
+            document.getElementById('test-results').innerHTML = '';
         }
         
         function hideLoader() {
@@ -117,8 +162,11 @@
                 document.getElementById('results').innerHTML = `
                     <div style="color: red; padding: 20px; text-align: center;">
                         <h4>⚠️ Error Scanning</h4>
-                        <p>Please try again. If this continues, wait 1 minute and refresh.</p>
-                        <p><small>Render free tier sleeps after 15 minutes</small></p>
+                        <p>Server might be sleeping. Please wait 15 seconds and try again.</p>
+                        <p><small>Free tier sleeps after 15 minutes of inactivity</small></p>
+                        <button class="btn" onclick="scan('${patternType}')" style="margin-top: 10px;">
+                            Try Again
+                        </button>
                     </div>
                 `;
             }
@@ -127,47 +175,134 @@
         function displayResults(data, patternType) {
             let html = `<h3>Scan Results (${patternType})</h3>`;
             
+            // Check if data is empty
             if (!data || data.length === 0) {
-                html += `<p>No patterns found. Try another scan.</p>`;
-            } else if (patternType === 'quick') {
-                html += `<p>Found ${data.length} stocks with patterns:</p>`;
+                html += `
+                    <div style="text-align: center; padding: 30px;">
+                        <h4>📭 No ${patternType} patterns found</h4>
+                        <p>No volume patterns detected in current market data.</p>
+                        <p>Try:</p>
+                        <ul style="text-align: left; display: inline-block;">
+                            <li>Scanning a different pattern type</li>
+                            <li>Trying again in 1-2 hours</li>
+                            <li>Checking during market hours (9:15 AM - 3:30 PM IST)</li>
+                        </ul>
+                    </div>
+                `;
+                document.getElementById('results').innerHTML = html;
+                return;
+            }
+            
+            if (patternType === 'quick') {
+                html += `<p>Found <strong>${data.length}</strong> stocks with patterns:</p>`;
                 data.forEach(stock => {
+                    const changeClass = stock.change >= 0 ? 'price-up' : 'price-down';
+                    const changeSymbol = stock.change >= 0 ? '↗' : '↘';
                     html += `
                         <div class="stock-item">
-                            <h4>${stock.symbol} - ₹${stock.price}</h4>
-                            <div>${stock.patterns.map(p => 
+                            <h4>${stock.symbol} - ₹${stock.price} 
+                                <span class="${changeClass}">${changeSymbol} ${Math.abs(stock.change)}%</span>
+                            </h4>
+                            <div><strong>Patterns:</strong> ${stock.patterns.map(p => 
                                 `<span class="pattern-badge">${p}</span>`
                             ).join(' ')}</div>
+                            <div style="font-size: 13px; color: #666; margin-top: 5px;">
+                                Volume: ${stock.volume.toLocaleString()} | 
+                                Sector: ${stock.sector || 'N/A'}
+                            </div>
                         </div>
                     `;
                 });
             } else {
-                html += `<p>Found ${data.length} patterns:</p>`;
+                html += `<p>Found <strong>${data.length}</strong> ${patternType} patterns:</p>`;
                 data.forEach(item => {
+                    const changeClass = item.change >= 0 ? 'price-up' : 'price-down';
+                    const changeSymbol = item.change >= 0 ? '↗' : '↘';
                     html += `
                         <div class="stock-item">
                             <h4>${item.symbol} - ${item.pattern}</h4>
-                            <p>Price: ₹${item.price} | Volume: ${item.volume.toLocaleString()}</p>
+                            <p>
+                                Price: ₹${item.price} 
+                                <span class="${changeClass}">${changeSymbol} ${Math.abs(item.change)}%</span>
+                            </p>
+                            <p>Volume: ${item.volume.toLocaleString()}</p>
+                            <div style="font-size: 13px; color: #666;">
+                                ${item.sector || ''}
+                            </div>
                         </div>
                     `;
                 });
             }
             
+            html += `<div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="scan('${patternType}')">🔄 Rescan</button>
+            </div>`;
+            
             document.getElementById('results').innerHTML = html;
         }
         
-        // Check if server is running
+        async function checkStatus() {
+            showLoader();
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                hideLoader();
+                document.getElementById('test-results').innerHTML = `
+                    <div class="results">
+                        <h4>✅ Server Status: ${data.status}</h4>
+                        <p>Patterns available: ${data.patterns?.join(', ') || 'N/A'}</p>
+                        <p>Stocks tracked: ${data.stocks_tracked || '10+'}</p>
+                        <p>Last check: ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                `;
+            } catch (error) {
+                hideLoader();
+                document.getElementById('test-results').innerHTML = `
+                    <div class="results" style="background: #fee2e2;">
+                        <h4>❌ Server Not Responding</h4>
+                        <p>The server might be sleeping. Try clicking any scan button to wake it up.</p>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testYFinance() {
+            showLoader();
+            try {
+                const response = await fetch('/api/test-yfinance');
+                const data = await response.json();
+                hideLoader();
+                document.getElementById('test-results').innerHTML = `
+                    <div class="results">
+                        <h4>🧪 Data Source Test</h4>
+                        <p>yFinance connection: ${data.success ? '✅ SUCCESS' : '❌ FAILED'}</p>
+                        <p>Data points: ${data.data_length || 0}</p>
+                        <p>Test time: ${new Date().toLocaleTimeString()}</p>
+                        ${data.error ? `<p style="color: red;">Error: ${data.error}</p>` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                hideLoader();
+                document.getElementById('test-results').innerHTML = `
+                    <div class="results" style="background: #fee2e2;">
+                        <h4>❌ Test Failed</h4>
+                        <p>Cannot reach test endpoint. Server might be offline.</p>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Check if server is running on page load
         window.onload = async () => {
             try {
                 await fetch('/api/status');
             } catch {
                 console.log('App starting...');
             }
+            updateTime();
         };
     </script>
-if (!data || data.length === 0) {
-    html += `<p>No ${patternType} patterns found in current market data.</p>`;
-    html += `<p>Try again in 1 hour or try a different pattern.</p>`;
-}
 </body>
 </html>
