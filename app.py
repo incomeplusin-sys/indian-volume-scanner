@@ -63,3 +63,32 @@ def health():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
+@app.route('/api/scan/<pattern_type>')
+def scan_pattern(pattern_type):
+    try:
+        if pattern_type == 'v_pattern':
+            results = scanner.scan_v_patterns(limit=10)
+        # ... other patterns ...
+        
+        # Check if we got any results
+        if not results:  # Empty list
+            return jsonify({
+                'success': True,
+                'pattern_type': pattern_type,
+                'count': 0,
+                'message': 'No patterns found in current market data',
+                'data': [],
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+        
+        return jsonify({
+            'success': True,
+            'pattern_type': pattern_type,
+            'count': len(results),
+            'data': results,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
