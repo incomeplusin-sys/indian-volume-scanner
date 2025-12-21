@@ -26,27 +26,62 @@ def test_yfinance():
 
 @app.route('/api/scan/<pattern_type>')
 def scan_pattern(pattern_type):
+    """Main scanning endpoint for all pattern types"""
     try:
+        start_time = time.time()
+        
         if pattern_type == 'v_pattern':
-            results = scanner.scan_v_patterns(limit=15)
+            results = scanner.scan_v_patterns(limit=10)
         elif pattern_type == 'u_pattern':
-            results = scanner.scan_u_patterns(limit=15)
+            results = scanner.scan_u_patterns(limit=10)
         elif pattern_type == '3plus3':
-            results = scanner.scan_3plus3_patterns(limit=15)
+            results = scanner.scan_3plus3_patterns(limit=10)
         elif pattern_type == 'pyramid':
-            results = scanner.scan_pyramid_patterns(limit=15)
+            results = scanner.scan_pyramid_patterns(limit=10)
         elif pattern_type == 'increasing':
-            results = scanner.scan_increasing_patterns(limit=15)
+            results = scanner.scan_increasing_patterns(limit=10)
         elif pattern_type == 'decreasing':
-            results = scanner.scan_decreasing_patterns(limit=15)
+            results = scanner.scan_decreasing_patterns(limit=10)
         elif pattern_type == 'quick':
             results = scanner.quick_scan_all(limit=10)
         else:
-            return jsonify({'error': 'Invalid pattern type'}), 400
+            return jsonify({
+                'success': False,
+                'error': 'Invalid pattern type',
+                'pattern_type': pattern_type,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }), 400
         
-        return jsonify(results)
+        scan_time = round(time.time() - start_time, 2)
+        
+        # Check if we got any results
+        if not results:  # Empty list
+            return jsonify({
+                'success': True,
+                'pattern_type': pattern_type,
+                'count': 0,
+                'scan_time_seconds': scan_time,
+                'message': 'No patterns found in current market data',
+                'data': [],
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+        
+        return jsonify({
+            'success': True,
+            'pattern_type': pattern_type,
+            'count': len(results),
+            'scan_time_seconds': scan_time,
+            'data': results,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+        
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'pattern_type': pattern_type,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }), 500
 
 @app.route('/api/status')
 def status():
