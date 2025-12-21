@@ -1,498 +1,782 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Indian Volume Pattern Scanner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Security Scanner</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
-            line-height: 1.6;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .container { 
-            max-width: 1400px; 
-            margin: auto; 
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .header { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; 
-            padding: 40px 30px; 
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
             text-align: center;
-        }
-        .header h1 { 
-            margin: 0; 
-            font-size: 2.5rem; 
-            font-weight: 700;
-        }
-        .header p { 
-            margin: 10px 0 0; 
-            opacity: 0.9; 
-            font-size: 1.1rem;
-        }
-        .stats-bar {
-            background: #f8f9fa;
-            padding: 15px;
-            display: flex;
-            justify-content: space-around;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .btn-container {
+            margin-bottom: 40px;
             padding: 30px;
-            text-align: center;
-            background: #f8f9fa;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 15px;
+            border: 1px solid #475569;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
-        .btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            margin: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        
+        .scanner-form {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #475569;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+            color: #cbd5e1;
         }
-        .btn:hover { 
-            background: #5a67d8; 
+        
+        .url-input {
+            width: 100%;
+            padding: 15px;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .scan-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .scan-option {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #475569;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .scan-option:hover {
+            border-color: #3b82f6;
+            background: #2d3748;
+        }
+        
+        .scan-option.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .scan-option input {
+            margin-right: 10px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-scan {
+            background: linear-gradient(90deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .btn-scan:hover {
+            background: linear-gradient(90deg, #059669, #047857);
             transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
         }
-        .btn-quick {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            font-size: 18px;
-            padding: 16px 32px;
+        
+        .btn-clear {
+            background: #475569;
+            color: #e2e8f0;
         }
-        .btn-test {
-            background: #10b981;
+        
+        .btn-clear:hover {
+            background: #64748b;
+            transform: translateY(-2px);
         }
-        .results { 
-            padding: 30px; 
-            min-height: 500px;
+        
+        .results-section {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #475569;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #475569;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            color: #60a5fa;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .status-scanning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
+        
+        .status-complete {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        
+        .results-content {
             display: none;
         }
+        
+        .results-content.active {
+            display: block;
+        }
+        
+        .vulnerability-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s;
+        }
+        
+        .vulnerability-item.critical {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .vulnerability-item.high {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .vulnerability-item.medium {
+            border-left-color: #eab308;
+            background: rgba(234, 179, 8, 0.1);
+        }
+        
+        .vulnerability-item.low {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .vuln-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+        
+        .vuln-description {
+            color: #94a3b8;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .vuln-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+        
+        .vuln-severity {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .severity-critical {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .severity-high {
+            background: #f59e0b;
+            color: #1e293b;
+        }
+        
+        .severity-medium {
+            background: #eab308;
+            color: #1e293b;
+        }
+        
+        .severity-low {
+            background: #10b981;
+            color: white;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .pattern-grid {
+        
+        .summary-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
-        .pattern-card {
-            background: white;
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
             border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border: 1px solid #e9ecef;
-            transition: transform 0.3s ease;
-        }
-        .pattern-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        }
-        .pattern-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f2f5;
-        }
-        .pattern-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2d3748;
-        }
-        .pattern-date {
-            background: #e9ecef;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .pattern-price {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin: 10px 0;
-        }
-        .pattern-change {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 5px 12px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        .change-up { background: #d1fae5; color: #065f46; }
-        .change-down { background: #fee2e2; color: #991b1b; }
-        .pattern-details {
-            margin-top: 20px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: #6c757d; font-weight: 500; }
-        .detail-value { color: #2d3748; font-weight: 600; }
-        .no-results {
             text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
+            border: 1px solid #475569;
         }
-        .no-results-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-        .info-section {
-            background: #e0f2fe;
-            padding: 25px;
-            margin: 30px;
-            border-radius: 10px;
-            border-left: 5px solid #0ea5e9;
-        }
-        .info-title {
-            font-size: 1.3rem;
+        
+        .stat-value {
+            font-size: 2rem;
             font-weight: 700;
-            color: #0369a1;
-            margin-bottom: 15px;
-        }
-        .pattern-definitions {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .pattern-def {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .pattern-def-title {
-            font-weight: 600;
-            color: #2d3748;
             margin-bottom: 5px;
         }
-        .pattern-def-desc {
-            color: #6c757d;
-            font-size: 0.95rem;
-        }
-        .performance-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        .perf-good { background: #d1fae5; color: #065f46; }
-        .perf-bad { background: #fee2e2; color: #991b1b; }
-        .perf-neutral { background: #e5e7eb; color: #4b5563; }
-        .timestamp {
+        
+        .stat-critical { color: #ef4444; }
+        .stat-high { color: #f59e0b; }
+        .stat-medium { color: #eab308; }
+        .stat-low { color: #10b981; }
+        
+        footer {
             text-align: center;
-            color: #6c757d;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #475569;
+            color: #94a3b8;
             font-size: 0.9rem;
-            padding: 15px;
-            border-top: 1px solid #e9ecef;
-            margin-top: 30px;
         }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #a7f3d0;
+        }
+        
         @media (max-width: 768px) {
-            .pattern-grid { grid-template-columns: 1fr; }
-            .btn { display: block; width: 100%; margin: 10px 0; }
-            .stats-bar { flex-direction: column; }
-            .stat-item { margin: 10px 0; }
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .scanner-form, .results-section {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .scan-types {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📊 Indian Volume Pattern Scanner</h1>
-            <p>Historical Pattern Analysis • Educational Tool • Free Forever</p>
-            <div id="current-time" style="margin-top: 15px; font-size: 0.95rem;"></div>
-        </div>
+        <header>
+            <h1>🔍 Web Security Scanner</h1>
+            <p class="subtitle">Comprehensive security assessment tool for web applications</p>
+        </header>
         
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-value" id="stocks-count">10</div>
-                <div class="stat-label">Stocks Tracked</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="patterns-count">6</div>
-                <div class="stat-label">Pattern Types</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="data-period">2 Years</div>
-                <div class="stat-label">Historical Data</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="server-status">✓</div>
-                <div class="stat-label">Server Status</div>
-            </div>
-        </div>
+        <div class="alert" id="alertMessage"></div>
         
-        <div class="info-section">
-            <div class="info-title">📚 How This Scanner Works</div>
-            <p>This tool analyzes <strong>2 years of historical volume data</strong> from Indian stocks to identify volume patterns. Unlike real-time scanners that only show current patterns, this shows:</p>
-            <ul>
-                <li><strong>Recent Patterns</strong> (Last 6 months)</li>
-                <li><strong>Historical Occurrences</strong> (When patterns actually happened)</li>
-                <li><strong>Performance Analysis</strong> (Price movement after pattern)</li>
-                <li><strong>Pattern Frequency</strong> (How often patterns occur)</li>
-            </ul>
-            <p>Perfect for studying market behavior and understanding volume patterns!</p>
-        </div>
-        
-        <div class="btn-container">
-            <button class="btn btn-quick" onclick="scan('quick')">
-                🚀 Quick Historical Scan
-            </button>
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="scan('v_pattern')">V-Pattern</button>
-                <button class="btn" onclick="scan('u_pattern')">U-Pattern</button>
-                <button class="btn" onclick="scan('3plus3')">3+3 Pattern</button>
-                <button class="btn" onclick="scan('pyramid')">Pyramid</button>
-                <button class="btn" onclick="scan('increasing')">Increasing</button>
-                <button class="btn" onclick="scan('decreasing')">Decreasing</button>
+        <div class="scanner-form">
+            <div class="form-group">
+                <label for="targetUrl">Target URL</label>
+                <input type="url" id="targetUrl" class="url-input" 
+                       placeholder="https://example.com" 
+                       value="https://example.com">
             </div>
-            <div>
-                <button class="btn btn-test" onclick="testDataSource()">
-                    🔍 Test Data Source
-                </button>
-                <button class="btn" onclick="showPatternDefinitions()" style="background: #6b7280;">
-                    📖 Pattern Definitions
-                </button>
-            </div>
-        </div>
-        
-        <div class="loader" id="loader"></div>
-        
-        <div class="results" id="results">
-            <div style="text-align: center; padding: 40px;">
-                <h3>Welcome to Volume Pattern Historical Scanner</h3>
-                <p>Click any scan button above to analyze historical volume patterns.</p>
-                <p>This scanner examines <strong>2 years of data</strong> to show you actual pattern occurrences, not just current market conditions.</p>
-                
-                <div class="pattern-definitions" id="pattern-defs" style="display: none; margin-top: 30px;">
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">V-Pattern</div>
-                        <div class="pattern-def-desc">Volume spikes suddenly, then drops - often before price reversal</div>
-                    </div>
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">U-Pattern</div>
-                        <div class="pattern-def-desc">Volume decreases gradually, then increases - indicates accumulation</div>
-                    </div>
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">3+3 Pattern</div>
-                        <div class="pattern-def-desc">3 days of high volume followed by 3 days of low volume (or vice versa)</div>
-                    </div>
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">Pyramid Pattern</div>
-                        <div class="pattern-def-desc">Volume increases then decreases symmetrically - smart money activity</div>
-                    </div>
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">Increasing Pattern</div>
-                        <div class="pattern-def-desc">Consistently rising volume over 3+ days - growing interest</div>
-                    </div>
-                    <div class="pattern-def">
-                        <div class="pattern-def-title">Decreasing Pattern</div>
-                        <div class="pattern-def-desc">Consistently falling volume over 3+ days - loss of interest</div>
-                    </div>
+            
+            <div class="form-group">
+                <label>Scan Types</label>
+                <div class="scan-types">
+                    <label class="scan-option">
+                        <input type="checkbox" name="scanType" value="sql" checked>
+                        SQL Injection
+                    </label>
+                    <label class="scan-option">
+                        <input type="checkbox" name="scanType" value="xss" checked>
+                        XSS Vulnerabilities
+                    </label>
+                    <label class="scan-option">
+                        <input type="checkbox" name="scanType" value="headers">
+                        Security Headers
+                    </label>
+                    <label class="scan-option">
+                        <input type="checkbox" name="scanType" value="cors">
+                        CORS Misconfigurations
+                    </label>
+                    <label class="scan-option">
+                        <input type="checkbox" name="scanType" value="info">
+                        Information Disclosure
+                    </label>
                 </div>
             </div>
+            
+            <div class="buttons">
+                <button class="btn btn-scan" id="scanBtn">
+                    <span>🚀 Start Security Scan</span>
+                </button>
+                <button class="btn btn-clear" id="clearBtn">
+                    <span>🗑️ Clear Results</span>
+                </button>
+            </div>
         </div>
         
-        <div class="timestamp" id="last-update">
-            Last scan: Not yet performed • Data source: Yahoo Finance Historical
+        <div class="results-section">
+            <div class="results-header">
+                <h2 class="results-title">Scan Results</h2>
+                <div class="status-badge" id="statusBadge">Ready</div>
+            </div>
+            
+            <div class="summary-stats" id="summaryStats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-value stat-critical" id="statCritical">0</div>
+                    <div>Critical</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value stat-high" id="statHigh">0</div>
+                    <div>High</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value stat-medium" id="statMedium">0</div>
+                    <div>Medium</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value stat-low" id="statLow">0</div>
+                    <div>Low</div>
+                </div>
+            </div>
+            
+            <div class="loading" id="loadingIndicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Scanning target website for vulnerabilities...</p>
+                <p id="currentScan">Initializing scanner...</p>
+            </div>
+            
+            <div class="results-content" id="resultsContent">
+                <!-- Results will be populated here -->
+            </div>
         </div>
+        
+        <footer>
+            <p>© 2025 Web Security Scanner | For security testing purposes only</p>
+            <p>Use responsibly and only on websites you own or have permission to test</p>
+        </footer>
     </div>
 
     <script>
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            document.getElementById('current-time').textContent = 
-                `Last updated: ${now.toLocaleTimeString()} | ${now.toLocaleDateString('en-IN', options)}`;
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
-        
-        function showLoader() {
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('results').innerHTML = '';
-        }
-        
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-        
-        function showPatternDefinitions() {
-            const defs = document.getElementById('pattern-defs');
-            defs.style.display = defs.style.display === 'none' ? 'grid' : 'none';
-        }
-        
-        async function scan(patternType) {
-            showLoader();
-            document.getElementById('last-update').textContent = `Scanning ${patternType.replace('_', ' ')}...`;
+        // Sample vulnerability data for demonstration
+        const sampleVulnerabilities = [
+            {
+                id: 1,
+                title: "Missing Security Headers",
+                description: "The website is missing crucial security headers like Content-Security-Policy and X-Frame-Options.",
+                severity: "high",
+                type: "headers",
+                url: "https://example.com",
+                recommendation: "Implement security headers: Content-Security-Policy, X-Frame-Options: DENY, X-Content-Type-Options: nosniff"
+            },
+            {
+                id: 2,
+                title: "SQL Injection Potential",
+                description: "URL parameters appear to be vulnerable to SQL injection attacks based on error messages.",
+                severity: "critical",
+                type: "sql",
+                url: "https://example.com/search?q=test",
+                recommendation: "Use parameterized queries and input validation for all database operations"
+            },
+            {
+                id: 3,
+                title: "Cross-Site Scripting (XSS) Vulnerability",
+                description: "User input is reflected without proper sanitization in the response.",
+                severity: "high",
+                type: "xss",
+                url: "https://example.com/contact",
+                recommendation: "Implement output encoding and use a modern framework with built-in XSS protection"
+            },
+            {
+                id: 4,
+                title: "CORS Misconfiguration",
+                description: "CORS headers are too permissive, allowing requests from any origin.",
+                severity: "medium",
+                type: "cors",
+                url: "https://example.com/api",
+                recommendation: "Restrict CORS to specific trusted origins and use proper credentials settings"
+            },
+            {
+                id: 5,
+                title: "Sensitive Information Disclosure",
+                description: "Server headers reveal sensitive information about the technology stack.",
+                severity: "low",
+                type: "info",
+                url: "https://example.com",
+                recommendation: "Remove or obscure server headers that reveal version information"
+            }
+        ];
+
+        // DOM Elements
+        const scanBtn = document.getElementById('scanBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const targetUrl = document.getElementById('targetUrl');
+        const resultsContent = document.getElementById('resultsContent');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const statusBadge = document.getElementById('statusBadge');
+        const alertMessage = document.getElementById('alertMessage');
+        const summaryStats = document.getElementById('summaryStats');
+        const currentScan = document.getElementById('currentScan');
+
+        // Scan types
+        const scanTypes = [
+            { id: 'sql', name: 'SQL Injection', description: 'Testing for database injection vulnerabilities' },
+            { id: 'xss', name: 'XSS Vulnerabilities', description: 'Testing for cross-site scripting vulnerabilities' },
+            { id: 'headers', name: 'Security Headers', description: 'Checking for missing security headers' },
+            { id: 'cors', name: 'CORS Misconfigurations', description: 'Testing for CORS configuration issues' },
+            { id: 'info', name: 'Information Disclosure', description: 'Checking for sensitive information leaks' }
+        ];
+
+        // Event Listeners
+        scanBtn.addEventListener('click', startScan);
+        clearBtn.addEventListener('click', clearResults);
+
+        // Scan option selection styling
+        document.querySelectorAll('.scan-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const checkbox = this.querySelector('input');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            });
+        });
+
+        // Initialize scan options as selected
+        document.querySelectorAll('.scan-option input:checked').forEach(checkbox => {
+            checkbox.closest('.scan-option').classList.add('selected');
+        });
+
+        function showAlert(message, type = 'error') {
+            alertMessage.textContent = message;
+            alertMessage.className = `alert alert-${type}`;
+            alertMessage.style.display = 'block';
             
+            setTimeout(() => {
+                alertMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function validateUrl(url) {
             try {
-                const response = await fetch(`/api/scan/${patternType}`);
-                const data = await response.json();
-                
-                hideLoader();
-                
-                if (data.success === false) {
-                    displayError(data.error || 'Scan failed');
-                    return;
-                }
-                
-                displayResults(data, patternType);
-                
-                // Update timestamp
-                const now = new Date();
-                document.getElementById('last-update').textContent = 
-                    `Last scan: ${now.toLocaleTimeString()} • Found ${data.count} results • Pattern: ${patternType}`;
-                    
-            } catch (error) {
-                hideLoader();
-                displayError(`Network error: ${error.message}. Server might be waking up (free tier sleeps after 15 mins).`);
+                const parsedUrl = new URL(url);
+                return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+            } catch {
+                return false;
             }
         }
-        
-        async function testDataSource() {
-            showLoader();
-            try {
-                const response = await fetch('/api/test-yfinance');
-                const data = await response.json();
-                
-                hideLoader();
-                
-                if (data.success) {
-                    document.getElementById('results').innerHTML = `
-                        <div style="text-align: center; padding: 30px;">
-                            <h3 style="color: #10b981;">✅ Data Source Working</h3>
-                            <p>Connected to Yahoo Finance successfully!</p>
-                            <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 500px;">
-                                <p><strong>Data Points:</strong> ${data.data_length}</p>
-                                <p><strong>Current Price Sample:</strong> ₹${data.current_price || 'N/A'}</p>
-                                <p><strong>Status:</strong> Ready for historical analysis</p>
-                            </div>
-                            <button class="btn" onclick="scan('quick')" style="margin-top: 20px;">
-                                Start Historical Scan
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    document.getElementById('results').innerHTML = `
-                        <div style="text-align: center; padding: 30px;">
-                            <h3 style="color: #ef4444;">❌ Data Source Issue</h3>
-                            <p>Unable to fetch real-time data. Using historical analysis mode.</p>
-                            <p><small>Error: ${data.error || 'Unknown error'}</small></p>
-                            <button class="btn" onclick="scan('quick')" style="margin-top: 20px; background: #6b7280;">
-                                Continue with Historical Analysis
-                            </button>
-                        </div>
-                    `;
-                }
-                
-            } catch (error) {
-                hideLoader();
-                displayError(`Test failed: ${error.message}`);
-            }
+
+        function getSelectedScanTypes() {
+            const selected = [];
+            document.querySelectorAll('input[name="scanType"]:checked').forEach(checkbox => {
+                selected.push(checkbox.value);
+            });
+            return selected;
         }
-        
-        function displayResults(data, patternType) {
-            let html = `<h2 style="text-align: center; margin-bottom: 10px; color: #2d3748;">
-                ${patternType === 'quick' ? '📈 Historical Pattern Overview' : '📊 Pattern Analysis'}
-            </h2>`;
+
+        async function startScan() {
+            const url = targetUrl.value.trim();
+            const selectedTypes = getSelectedScanTypes();
             
-            html += `<div style="text-align: center; color: #6c757d; margin-bottom: 30px;">
-                <p>Scanning <strong>${patternType.replace('_', ' ')}</strong> patterns in 2 years of historical data</p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; display: inline-block;">
-                    <span style="font-weight: 600;">Found: ${data.count} results</span>
-                    ${data.scan_time_seconds ? `<span style="margin-left: 20px;">⏱️ Scan time: ${data.scan_time_seconds}s</span>` : ''}
-                </div>
-            </div>`;
-            
-            if (data.count === 0) {
-                html += `
-                    <div class="no-results">
-                        <div class="no-results-icon">📭</div>
-                        <h3>No Historical Patterns Found</h3>
-                        <p>No ${patternType.replace('_', ' ')} patterns detected in the last 2 years for tracked stocks.</p>
-                        <p>This could mean:</p>
-                        <ul style="text-align: left; display: inline-block; margin: 20px 0;">
-                            <li>Patterns are rare for these stocks</li>
-                            <li>Market conditions haven't created these patterns recently</li>
-                            <li>Try a different pattern type</li>
-                        </ul>
-                        <button class="btn" onclick="showPatternDefinitions()" style="margin-top: 20px;">
-                            View Pattern Definitions
-                        </button>
-                    </div>
-                `;
-                document.getElementById('results').innerHTML = html;
+            // Validation
+            if (!url) {
+                showAlert('Please enter a target URL', 'error');
                 return;
             }
             
-            if (patternType === 'quick') {
-                html += '<div class="pattern-grid">';
+            if (!validateUrl(url)) {
+                showAlert('Please enter a valid URL (starting with http:// or https://)', 'error');
+                return;
+            }
+            
+            if (selectedTypes.length === 0) {
+                showAlert('Please select at least one scan type', 'error');
+                return;
+            }
+            
+            // Update UI
+            scanBtn.disabled = true;
+            scanBtn.innerHTML = '<span>🔍 Scanning...</span>';
+            statusBadge.textContent = 'Scanning';
+            statusBadge.className = 'status-badge status-scanning';
+            loadingIndicator.style.display = 'block';
+            resultsContent.innerHTML = '';
+            summaryStats.style.display = 'none';
+            
+            // Simulate scanning process
+            try {
+                // In a real implementation, this would be an API call
+                await simulateScanProcess(url, selectedTypes);
                 
-                data.data.forEach(stock => {
-                    const changeClass = stock.change >= 0 ? 'change-up' : 'change-down';
-                    const changeSymbol = stock.change >= 0 ? '↗' : '↘';
+                // Display results
+                displayResults(sampleVulnerabilities);
+                
+                // Update status
+                statusBadge.textContent = 'Complete';
+                statusBadge.className = 'status-badge status-complete';
+                showAlert(`Scan completed for ${url}`, 'success');
+                
+            } catch (error) {
+                console.error('Scan error:', error);
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'status-badge status-error';
+                showAlert('Scan failed. Please try again.', 'error');
+            } finally {
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<span>🚀 Start Security Scan</span>';
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        async function simulateScanProcess(url, selectedTypes) {
+            // Simulate scanning each type
+            for (let i = 0; i < selectedTypes.length; i++) {
+                const type = selectedTypes[i];
+                const typeInfo = scanTypes.find(t => t.id === type);
+                
+                if (typeInfo) {
+                    currentScan.textContent = `Scanning: ${typeInfo.name} - ${typeInfo.description}`;
                     
-                    html += `
-                        <div class="pattern-card">
-                            <div class="pattern-header">
-                                <div class="pattern-name">${stock.symbol}</div>
-                                <div class="pattern-date">${stock.last_pattern_date || 'Historical'}</div>
-                            </div>
-                            <div class="pat
+                    // Simulate API delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            }
+            
+            // Final delay for processing
+            currentScan.textContent = 'Processing results...';
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        function displayResults(vulnerabilities) {
+            // Filter based on selected scan types
+            const selectedTypes = getSelectedScanTypes();
+            const filteredVulns = vulnerabilities.filter(vuln => 
+                selectedTypes.includes(vuln.type)
+            );
+            
+            if (filteredVulns.length === 0) {
+                resultsContent.innerHTML = `
+                    <div class="vulnerability-item">
+                        <div class="vuln-title">✅ No Vulnerabilities Found</div>
+                        <div class="vuln-description">
+                            Great news! No security vulnerabilities were detected for the selected scan types.
+                        </div>
+                    </div>
+                `;
+                updateSummaryStats([{severity: 'none'}]);
+                return;
+            }
+            
+            // Sort by severity: critical > high > medium > low
+            const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+            filteredVulns.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+            
+            // Generate HTML for vulnerabilities
+            let html = '';
+            filteredVulns.forEach(vuln => {
+                html += `
+                    <div class="vulnerability-item ${vuln.severity}">
+                        <div class="vuln-title">${vuln.title}</div>
+                        <div class="vuln-description">${vuln.description}</div>
+                        <div class="vuln-info">
+                            <span class="vuln-severity severity-${vuln.severity}">
+                                ${vuln.severity.toUpperCase()}
+                            </span>
+                            <span>Type: ${vuln.type.toUpperCase()}</span>
+                            <span>URL: ${vuln.url}</span>
+                        </div>
+                        <div class="vuln-description" style="margin-top: 10px; font-style: italic;">
+                            <strong>Recommendation:</strong> ${vuln.recommendation}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContent.innerHTML = html;
+            updateSummaryStats(filteredVulns);
+            summaryStats.style.display = 'grid';
+        }
+
+        function updateSummaryStats(vulnerabilities) {
+            if (vulnerabilities[0]?.severity === 'none') {
+                document.getElementById('statCritical').textContent = '0';
+                document.getElementById('statHigh').textContent = '0';
+                document.getElementById('statMedium').textContent = '0';
+                document.getElementById('statLow').textContent = '0';
+                return;
+            }
+            
+            const counts = {
+                critical: vulnerabilities.filter(v => v.severity === 'critical').length,
+                high: vulnerabilities.filter(v => v.severity === 'high').length,
+                medium: vulnerabilities.filter(v => v.severity === 'medium').length,
+                low: vulnerabilities.filter(v => v.severity === 'low').length
+            };
+            
+            document.getElementById('statCritical').textContent = counts.critical;
+            document.getElementById('statHigh').textContent = counts.high;
+            document.getElementById('statMedium').textContent = counts.medium;
+            document.getElementById('statLow').textContent = counts.low;
+        }
+
+        function clearResults() {
+            resultsContent.innerHTML = '';
+            statusBadge.textContent = 'Ready';
+            statusBadge.className = 'status-badge';
+            summaryStats.style.display = 'none';
+            targetUrl.value = 'https://example.com';
+            
+            // Reset checkboxes
+            document.querySelectorAll('input[name="scanType"]').forEach(checkbox => {
+                checkbox.checked = checkbox.value === 'sql' || checkbox.value === 'xss';
+            });
+            
+            // Reset styling
+            document.querySelectorAll('.scan-option').forEach(option => {
+                option.classList.remove('selected');
+                const checkbox = option.querySelector('input');
+                if (checkbox.checked) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            showAlert('Results cleared successfully', 'success');
+        }
+
+        // Initialize with example scan
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                displayResults([]);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
