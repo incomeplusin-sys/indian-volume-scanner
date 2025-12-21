@@ -62,3 +62,46 @@ def health():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
+@app.route('/api/verify-prices')
+def verify_prices():
+    """Verify prices against known values"""
+    import yfinance as yf
+    from datetime import datetime
+    
+    test_stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
+    results = {}
+    
+    for symbol in test_stocks:
+        try:
+            ticker = yf.Ticker(symbol)
+            info = ticker.info
+            
+            results[symbol] = {
+                'currentPrice': info.get('currentPrice'),
+                'regularMarketPrice': info.get('regularMarketPrice'),
+                'previousClose': info.get('previousClose'),
+                'open': info.get('open'),
+                'dayHigh': info.get('dayHigh'),
+                'dayLow': info.get('dayLow'),
+                'volume': info.get('volume'),
+                'info_keys': list(info.keys())[:10]  # First 10 keys
+            }
+            
+            # Also try history
+            hist = ticker.history(period="1d")
+            if not hist.empty:
+                results[symbol]['history_price'] = float(hist['Close'].iloc[-1])
+                
+        except Exception as e:
+            results[symbol] = {'error': str(e)}
+    
+    return jsonify({
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'expected': {
+            'RELIANCE.NS': 2565.10,
+            'TCS.NS': 3282.00,
+            'INFY.NS': 1492.34
+        },
+        'fetched': results
+    })
