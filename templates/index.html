@@ -165,5 +165,9 @@
             }
         };
     </script>
+if (!data || data.length === 0) {
+    html += `<p>No ${patternType} patterns found in current market data.</p>`;
+    html += `<p>Try again in 1 hour or try a different pattern.</p>`;
+}
 </body>
 </html>
