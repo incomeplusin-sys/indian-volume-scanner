@@ -9,6 +9,22 @@ scanner = VolumePatternScanner()
 def home():
     return render_template('index.html')
 
+# NEW TEST ROUTE - ADD THIS
+@app.route('/api/test-yfinance')
+def test_yfinance():
+    try:
+        import yfinance as yf
+        ticker = yf.Ticker("RELIANCE.NS")
+        data = ticker.history(period="1d")
+        return jsonify({
+            'success': not data.empty,
+            'data_length': len(data),
+            'columns': list(data.columns) if not data.empty else [],
+            'sample_data': data.to_dict() if not data.empty else {}
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/scan/<pattern_type>')
 def scan_pattern(pattern_type):
     try:
