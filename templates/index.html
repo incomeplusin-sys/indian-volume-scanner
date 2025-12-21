@@ -1,139 +1,365 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Indian Volume Scanner</title>
+    <title>Indian Volume Pattern Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: Arial; padding: 20px; background: #f0f2f5; }
-        .container { max-width: 1200px; margin: auto; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: auto; 
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
         .header { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            margin-bottom: 20px;
+            padding: 40px 30px; 
             text-align: center;
+        }
+        .header h1 { 
+            margin: 0; 
+            font-size: 2.5rem; 
+            font-weight: 700;
+        }
+        .header p { 
+            margin: 10px 0 0; 
+            opacity: 0.9; 
+            font-size: 1.1rem;
+        }
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .btn-container {
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
         }
         .btn {
             background: #667eea;
             color: white;
             border: none;
-            padding: 12px 24px;
-            margin: 5px;
-            border-radius: 5px;
+            padding: 14px 28px;
+            margin: 8px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
         }
-        .btn:hover { background: #5a67d8; }
+        .btn:hover { 
+            background: #5a67d8; 
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+        }
+        .btn-quick {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+        .btn-test {
+            background: #10b981;
+        }
         .results { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px; 
+            min-height: 500px;
         }
-        .stock-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
-        }
-        .stock-item:last-child { border-bottom: none; margin-bottom: 0; }
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 40px auto;
             display: none;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .pattern-badge {
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .pattern-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease;
+        }
+        .pattern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .pattern-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .pattern-date {
             background: #e9ecef;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
-            margin: 3px;
-            font-size: 14px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .pattern-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 10px 0;
+        }
+        .pattern-change {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
             display: inline-block;
         }
-        .price-up { color: #10b981; }
-        .price-down { color: #ef4444; }
-        .info-text {
-            background: #e0f2fe;
+        .change-up { background: #d1fae5; color: #065f46; }
+        .change-down { background: #fee2e2; color: #991b1b; }
+        .pattern-details {
+            margin-top: 20px;
+            background: #f8f9fa;
             padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border-left: 4px solid #0ea5e9;
+            border-radius: 8px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #6c757d; font-weight: 500; }
+        .detail-value { color: #2d3748; font-weight: 600; }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        .info-section {
+            background: #e0f2fe;
+            padding: 25px;
+            margin: 30px;
+            border-radius: 10px;
+            border-left: 5px solid #0ea5e9;
+        }
+        .info-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0369a1;
+            margin-bottom: 15px;
+        }
+        .pattern-definitions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .pattern-def {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .pattern-def-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        .pattern-def-desc {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        .performance-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .perf-good { background: #d1fae5; color: #065f46; }
+        .perf-bad { background: #fee2e2; color: #991b1b; }
+        .perf-neutral { background: #e5e7eb; color: #4b5563; }
+        .timestamp {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+            margin-top: 30px;
+        }
+        @media (max-width: 768px) {
+            .pattern-grid { grid-template-columns: 1fr; }
+            .btn { display: block; width: 100%; margin: 10px 0; }
+            .stats-bar { flex-direction: column; }
+            .stat-item { margin: 10px 0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📈 Indian Volume Pattern Scanner</h1>
-            <p>Real-time Volume Analysis • Free • No API Keys Required</p>
-            <div style="font-size: 14px; margin-top: 10px; opacity: 0.9;">
-                <span id="current-time">Loading...</span>
+            <h1>📊 Indian Volume Pattern Scanner</h1>
+            <p>Historical Pattern Analysis • Educational Tool • Free Forever</p>
+            <div id="current-time" style="margin-top: 15px; font-size: 0.95rem;"></div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="stocks-count">10</div>
+                <div class="stat-label">Stocks Tracked</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="patterns-count">6</div>
+                <div class="stat-label">Pattern Types</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="data-period">2 Years</div>
+                <div class="stat-label">Historical Data</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="server-status">✓</div>
+                <div class="stat-label">Server Status</div>
             </div>
         </div>
         
-        <div class="info-text">
-            <strong>ℹ️ How it works:</strong> Analyzes trading volume patterns of top Indian stocks to identify potential trading opportunities. Scans for 6 different volume patterns.
+        <div class="info-section">
+            <div class="info-title">📚 How This Scanner Works</div>
+            <p>This tool analyzes <strong>2 years of historical volume data</strong> from Indian stocks to identify volume patterns. Unlike real-time scanners that only show current patterns, this shows:</p>
+            <ul>
+                <li><strong>Recent Patterns</strong> (Last 6 months)</li>
+                <li><strong>Historical Occurrences</strong> (When patterns actually happened)</li>
+                <li><strong>Performance Analysis</strong> (Price movement after pattern)</li>
+                <li><strong>Pattern Frequency</strong> (How often patterns occur)</li>
+            </ul>
+            <p>Perfect for studying market behavior and understanding volume patterns!</p>
         </div>
         
-        <div style="text-align: center; margin: 30px 0;">
-            <button class="btn" onclick="scan('quick')">
-                🚀 Quick Scan (All Patterns)
+        <div class="btn-container">
+            <button class="btn btn-quick" onclick="scan('quick')">
+                🚀 Quick Historical Scan
             </button>
-            <button class="btn" onclick="scan('v_pattern')">V-Pattern</button>
-            <button class="btn" onclick="scan('u_pattern')">U-Pattern</button>
-            <button class="btn" onclick="scan('3plus3')">3+3 Pattern</button>
-            <button class="btn" onclick="scan('pyramid')">Pyramid</button>
-            <button class="btn" onclick="scan('increasing')">Increasing</button>
-            <button class="btn" onclick="scan('decreasing')">Decreasing</button>
-        </div>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button class="btn" onclick="checkStatus()" style="background: #6b7280;">
-                🔄 Check Server Status
-            </button>
-            <button class="btn" onclick="testYFinance()" style="background: #059669;">
-                🧪 Test Data Source
-            </button>
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="scan('v_pattern')">V-Pattern</button>
+                <button class="btn" onclick="scan('u_pattern')">U-Pattern</button>
+                <button class="btn" onclick="scan('3plus3')">3+3 Pattern</button>
+                <button class="btn" onclick="scan('pyramid')">Pyramid</button>
+                <button class="btn" onclick="scan('increasing')">Increasing</button>
+                <button class="btn" onclick="scan('decreasing')">Decreasing</button>
+            </div>
+            <div>
+                <button class="btn btn-test" onclick="testDataSource()">
+                    🔍 Test Data Source
+                </button>
+                <button class="btn" onclick="showPatternDefinitions()" style="background: #6b7280;">
+                    📖 Pattern Definitions
+                </button>
+            </div>
         </div>
         
         <div class="loader" id="loader"></div>
         
         <div class="results" id="results">
-            <h3>Welcome to Volume Pattern Scanner!</h3>
-            <p>Click any button above to start scanning.</p>
-            <p>Features:</p>
-            <ul>
-                <li>✅ <strong>6 different volume patterns</strong> (V, U, 3+3, Pyramid, Increasing, Decreasing)</li>
-                <li>✅ <strong>10+ Indian stocks</strong> (RELIANCE, TCS, INFY, HDFCBANK, etc.)</li>
-                <li>✅ <strong>Real analysis</strong> based on actual volume data</li>
-                <li>✅ <strong>100% Free</strong> hosting on Render</li>
-                <li>✅ <strong>No patterns = no results</strong> (shows "No patterns found" instead of fake data)</li>
-            </ul>
-            
-            <div class="info-text">
-                <strong>Note:</strong> The free Render tier sleeps after 15 minutes of inactivity. 
-                First scan may take 10-15 seconds to wake up the server.
+            <div style="text-align: center; padding: 40px;">
+                <h3>Welcome to Volume Pattern Historical Scanner</h3>
+                <p>Click any scan button above to analyze historical volume patterns.</p>
+                <p>This scanner examines <strong>2 years of data</strong> to show you actual pattern occurrences, not just current market conditions.</p>
+                
+                <div class="pattern-definitions" id="pattern-defs" style="display: none; margin-top: 30px;">
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">V-Pattern</div>
+                        <div class="pattern-def-desc">Volume spikes suddenly, then drops - often before price reversal</div>
+                    </div>
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">U-Pattern</div>
+                        <div class="pattern-def-desc">Volume decreases gradually, then increases - indicates accumulation</div>
+                    </div>
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">3+3 Pattern</div>
+                        <div class="pattern-def-desc">3 days of high volume followed by 3 days of low volume (or vice versa)</div>
+                    </div>
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">Pyramid Pattern</div>
+                        <div class="pattern-def-desc">Volume increases then decreases symmetrically - smart money activity</div>
+                    </div>
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">Increasing Pattern</div>
+                        <div class="pattern-def-desc">Consistently rising volume over 3+ days - growing interest</div>
+                    </div>
+                    <div class="pattern-def">
+                        <div class="pattern-def-title">Decreasing Pattern</div>
+                        <div class="pattern-def-desc">Consistently falling volume over 3+ days - loss of interest</div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div id="test-results" style="margin-top: 20px;"></div>
+        <div class="timestamp" id="last-update">
+            Last scan: Not yet performed • Data source: Yahoo Finance Historical
+        </div>
     </div>
 
     <script>
         // Update current time
         function updateTime() {
             const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
             document.getElementById('current-time').textContent = 
-                `Last updated: ${now.toLocaleTimeString()} | ${now.toLocaleDateString()}`;
+                `Last updated: ${now.toLocaleTimeString()} | ${now.toLocaleDateString('en-IN', options)}`;
         }
         setInterval(updateTime, 1000);
         updateTime();
@@ -141,52 +367,115 @@
         function showLoader() {
             document.getElementById('loader').style.display = 'block';
             document.getElementById('results').innerHTML = '';
-            document.getElementById('test-results').innerHTML = '';
         }
         
         function hideLoader() {
             document.getElementById('loader').style.display = 'none';
         }
         
+        function showPatternDefinitions() {
+            const defs = document.getElementById('pattern-defs');
+            defs.style.display = defs.style.display === 'none' ? 'grid' : 'none';
+        }
+        
         async function scan(patternType) {
             showLoader();
+            document.getElementById('last-update').textContent = `Scanning ${patternType.replace('_', ' ')}...`;
             
             try {
                 const response = await fetch(`/api/scan/${patternType}`);
                 const data = await response.json();
                 
                 hideLoader();
+                
+                if (data.success === false) {
+                    displayError(data.error || 'Scan failed');
+                    return;
+                }
+                
                 displayResults(data, patternType);
+                
+                // Update timestamp
+                const now = new Date();
+                document.getElementById('last-update').textContent = 
+                    `Last scan: ${now.toLocaleTimeString()} • Found ${data.count} results • Pattern: ${patternType}`;
+                    
             } catch (error) {
                 hideLoader();
-                document.getElementById('results').innerHTML = `
-                    <div style="color: red; padding: 20px; text-align: center;">
-                        <h4>⚠️ Error Scanning</h4>
-                        <p>Server might be sleeping. Please wait 15 seconds and try again.</p>
-                        <p><small>Free tier sleeps after 15 minutes of inactivity</small></p>
-                        <button class="btn" onclick="scan('${patternType}')" style="margin-top: 10px;">
-                            Try Again
-                        </button>
-                    </div>
-                `;
+                displayError(`Network error: ${error.message}. Server might be waking up (free tier sleeps after 15 mins).`);
+            }
+        }
+        
+        async function testDataSource() {
+            showLoader();
+            try {
+                const response = await fetch('/api/test-yfinance');
+                const data = await response.json();
+                
+                hideLoader();
+                
+                if (data.success) {
+                    document.getElementById('results').innerHTML = `
+                        <div style="text-align: center; padding: 30px;">
+                            <h3 style="color: #10b981;">✅ Data Source Working</h3>
+                            <p>Connected to Yahoo Finance successfully!</p>
+                            <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 500px;">
+                                <p><strong>Data Points:</strong> ${data.data_length}</p>
+                                <p><strong>Current Price Sample:</strong> ₹${data.current_price || 'N/A'}</p>
+                                <p><strong>Status:</strong> Ready for historical analysis</p>
+                            </div>
+                            <button class="btn" onclick="scan('quick')" style="margin-top: 20px;">
+                                Start Historical Scan
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('results').innerHTML = `
+                        <div style="text-align: center; padding: 30px;">
+                            <h3 style="color: #ef4444;">❌ Data Source Issue</h3>
+                            <p>Unable to fetch real-time data. Using historical analysis mode.</p>
+                            <p><small>Error: ${data.error || 'Unknown error'}</small></p>
+                            <button class="btn" onclick="scan('quick')" style="margin-top: 20px; background: #6b7280;">
+                                Continue with Historical Analysis
+                            </button>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                hideLoader();
+                displayError(`Test failed: ${error.message}`);
             }
         }
         
         function displayResults(data, patternType) {
-            let html = `<h3>Scan Results (${patternType})</h3>`;
+            let html = `<h2 style="text-align: center; margin-bottom: 10px; color: #2d3748;">
+                ${patternType === 'quick' ? '📈 Historical Pattern Overview' : '📊 Pattern Analysis'}
+            </h2>`;
             
-            // Check if data is empty
-            if (!data || data.length === 0) {
+            html += `<div style="text-align: center; color: #6c757d; margin-bottom: 30px;">
+                <p>Scanning <strong>${patternType.replace('_', ' ')}</strong> patterns in 2 years of historical data</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; display: inline-block;">
+                    <span style="font-weight: 600;">Found: ${data.count} results</span>
+                    ${data.scan_time_seconds ? `<span style="margin-left: 20px;">⏱️ Scan time: ${data.scan_time_seconds}s</span>` : ''}
+                </div>
+            </div>`;
+            
+            if (data.count === 0) {
                 html += `
-                    <div style="text-align: center; padding: 30px;">
-                        <h4>📭 No ${patternType} patterns found</h4>
-                        <p>No volume patterns detected in current market data.</p>
-                        <p>Try:</p>
-                        <ul style="text-align: left; display: inline-block;">
-                            <li>Scanning a different pattern type</li>
-                            <li>Trying again in 1-2 hours</li>
-                            <li>Checking during market hours (9:15 AM - 3:30 PM IST)</li>
+                    <div class="no-results">
+                        <div class="no-results-icon">📭</div>
+                        <h3>No Historical Patterns Found</h3>
+                        <p>No ${patternType.replace('_', ' ')} patterns detected in the last 2 years for tracked stocks.</p>
+                        <p>This could mean:</p>
+                        <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+                            <li>Patterns are rare for these stocks</li>
+                            <li>Market conditions haven't created these patterns recently</li>
+                            <li>Try a different pattern type</li>
                         </ul>
+                        <button class="btn" onclick="showPatternDefinitions()" style="margin-top: 20px;">
+                            View Pattern Definitions
+                        </button>
                     </div>
                 `;
                 document.getElementById('results').innerHTML = html;
@@ -194,115 +483,16 @@
             }
             
             if (patternType === 'quick') {
-                html += `<p>Found <strong>${data.length}</strong> stocks with patterns:</p>`;
-                data.forEach(stock => {
-                    const changeClass = stock.change >= 0 ? 'price-up' : 'price-down';
+                html += '<div class="pattern-grid">';
+                
+                data.data.forEach(stock => {
+                    const changeClass = stock.change >= 0 ? 'change-up' : 'change-down';
                     const changeSymbol = stock.change >= 0 ? '↗' : '↘';
+                    
                     html += `
-                        <div class="stock-item">
-                            <h4>${stock.symbol} - ₹${stock.price} 
-                                <span class="${changeClass}">${changeSymbol} ${Math.abs(stock.change)}%</span>
-                            </h4>
-                            <div><strong>Patterns:</strong> ${stock.patterns.map(p => 
-                                `<span class="pattern-badge">${p}</span>`
-                            ).join(' ')}</div>
-                            <div style="font-size: 13px; color: #666; margin-top: 5px;">
-                                Volume: ${stock.volume.toLocaleString()} | 
-                                Sector: ${stock.sector || 'N/A'}
+                        <div class="pattern-card">
+                            <div class="pattern-header">
+                                <div class="pattern-name">${stock.symbol}</div>
+                                <div class="pattern-date">${stock.last_pattern_date || 'Historical'}</div>
                             </div>
-                        </div>
-                    `;
-                });
-            } else {
-                html += `<p>Found <strong>${data.length}</strong> ${patternType} patterns:</p>`;
-                data.forEach(item => {
-                    const changeClass = item.change >= 0 ? 'price-up' : 'price-down';
-                    const changeSymbol = item.change >= 0 ? '↗' : '↘';
-                    html += `
-                        <div class="stock-item">
-                            <h4>${item.symbol} - ${item.pattern}</h4>
-                            <p>
-                                Price: ₹${item.price} 
-                                <span class="${changeClass}">${changeSymbol} ${Math.abs(item.change)}%</span>
-                            </p>
-                            <p>Volume: ${item.volume.toLocaleString()}</p>
-                            <div style="font-size: 13px; color: #666;">
-                                ${item.sector || ''}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += `<div style="text-align: center; margin-top: 20px;">
-                <button class="btn" onclick="scan('${patternType}')">🔄 Rescan</button>
-            </div>`;
-            
-            document.getElementById('results').innerHTML = html;
-        }
-        
-        async function checkStatus() {
-            showLoader();
-            try {
-                const response = await fetch('/api/status');
-                const data = await response.json();
-                hideLoader();
-                document.getElementById('test-results').innerHTML = `
-                    <div class="results">
-                        <h4>✅ Server Status: ${data.status}</h4>
-                        <p>Patterns available: ${data.patterns?.join(', ') || 'N/A'}</p>
-                        <p>Stocks tracked: ${data.stocks_tracked || '10+'}</p>
-                        <p>Last check: ${new Date().toLocaleTimeString()}</p>
-                    </div>
-                `;
-            } catch (error) {
-                hideLoader();
-                document.getElementById('test-results').innerHTML = `
-                    <div class="results" style="background: #fee2e2;">
-                        <h4>❌ Server Not Responding</h4>
-                        <p>The server might be sleeping. Try clicking any scan button to wake it up.</p>
-                        <p>Error: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-        
-        async function testYFinance() {
-            showLoader();
-            try {
-                const response = await fetch('/api/test-yfinance');
-                const data = await response.json();
-                hideLoader();
-                document.getElementById('test-results').innerHTML = `
-                    <div class="results">
-                        <h4>🧪 Data Source Test</h4>
-                        <p>yFinance connection: ${data.success ? '✅ SUCCESS' : '❌ FAILED'}</p>
-                        <p>Data points: ${data.data_length || 0}</p>
-                        <p>Test time: ${new Date().toLocaleTimeString()}</p>
-                        ${data.error ? `<p style="color: red;">Error: ${data.error}</p>` : ''}
-                    </div>
-                `;
-            } catch (error) {
-                hideLoader();
-                document.getElementById('test-results').innerHTML = `
-                    <div class="results" style="background: #fee2e2;">
-                        <h4>❌ Test Failed</h4>
-                        <p>Cannot reach test endpoint. Server might be offline.</p>
-                        <p>Error: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Check if server is running on page load
-        window.onload = async () => {
-            try {
-                await fetch('/api/status');
-            } catch {
-                console.log('App starting...');
-            }
-            updateTime();
-        };
-    </script>
-</body>
-</html>
+                            <div class="pat
