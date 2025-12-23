@@ -1,784 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Market Scanner & Analyzer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Indian Volume Scanner</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0a1929 0%, #0d1b2a 100%);
-            color: #e0e1dd;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 25px;
-            background: rgba(16, 42, 67, 0.8);
-            border-radius: 15px;
-            border: 1px solid #1b4965;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00b4d8, #0077b6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: #8d99ae;
-            margin-bottom: 15px;
-        }
-        
-        /* Scanner Controls */
-        .scanner-controls {
-            background: rgba(16, 42, 67, 0.8);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #1b4965;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        body { font-family: Arial; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 30px; 
+            border-radius: 10px; 
             margin-bottom: 20px;
+            text-align: center;
         }
-        
-        .control-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #caf0f8;
-            font-size: 0.95rem;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 12px 15px;
-            background: #1b3a4b;
-            border: 2px solid #415a77;
-            border-radius: 8px;
-            color: #e0e1dd;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: #00b4d8;
-            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
-        }
-        
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
         .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex: 1;
-        }
-        
-        .btn-scan {
-            background: linear-gradient(90deg, #00b4d8, #0077b6);
+            background: #667eea;
             color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
         }
-        
-        .btn-scan:hover {
-            background: linear-gradient(90deg, #0096c7, #005f8a);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.3);
-        }
-        
-        .btn-clear {
-            background: #415a77;
-            color: #e0e1dd;
-        }
-        
-        .btn-clear:hover {
-            background: #5a7a9c;
-            transform: translateY(-2px);
-        }
-        
-        /* Results Section */
-        .results-section {
-            background: rgba(16, 42, 67, 0.8);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #1b4965;
-            margin-top: 25px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #415a77;
-        }
-        
-        .results-title {
-            font-size: 1.5rem;
-            color: #00b4d8;
-        }
-        
-        .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .status-scanning {
-            background: rgba(255, 183, 3, 0.2);
-            color: #ffb703;
-            border: 1px solid #ffb703;
-        }
-        
-        .status-complete {
-            background: rgba(0, 180, 216, 0.2);
-            color: #00b4d8;
-            border: 1px solid #00b4d8;
-        }
-        
-        /* Stock Table */
-        .stocks-table {
-            width: 100%;
-            border-collapse: collapse;
+        .btn:hover { background: #5a67d8; }
+        .results { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
             margin-top: 20px;
-            overflow: hidden;
-            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .stocks-table th {
-            background: #1b3a4b;
+        .stock-item {
             padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #caf0f8;
-            border-bottom: 2px solid #415a77;
+            border-bottom: 1px solid #eee;
         }
-        
-        .stocks-table td {
-            padding: 15px;
-            border-bottom: 1px solid #2a4d69;
-            color: #e0e1dd;
-        }
-        
-        .stocks-table tr:hover {
-            background: rgba(0, 180, 216, 0.1);
-        }
-        
-        .stock-symbol {
-            font-weight: 700;
-            color: #90e0ef;
-        }
-        
-        .stock-name {
-            color: #b8c1d1;
-            font-size: 0.9rem;
-        }
-        
-        .price-up {
-            color: #06d6a0;
-            font-weight: 700;
-        }
-        
-        .price-down {
-            color: #ef476f;
-            font-weight: 700;
-        }
-        
-        .price-neutral {
-            color: #ffd166;
-            font-weight: 700;
-        }
-        
-        .signal-buy {
-            background: rgba(6, 214, 160, 0.2);
-            color: #06d6a0;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        .signal-sell {
-            background: rgba(239, 71, 111, 0.2);
-            color: #ef476f;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        .signal-hold {
-            background: rgba(255, 209, 102, 0.2);
-            color: #ffd166;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 180, 216, 0.3);
+        .stock-item:last-child { border-bottom: none; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            border-top: 4px solid #00b4d8;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 20px auto;
+            display: none;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        /* Market Stats */
-        .market-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-card {
-            background: rgba(27, 58, 75, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #415a77;
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .stat-positive { color: #06d6a0; }
-        .stat-negative { color: #ef476f; }
-        .stat-neutral { color: #ffd166; }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-info {
-            background: rgba(0, 180, 216, 0.2);
-            border: 1px solid #00b4d8;
-            color: #90e0ef;
-        }
-        
-        .alert-success {
-            background: rgba(6, 214, 160, 0.2);
-            border: 1px solid #06d6a0;
-            color: #9ef7e5;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #415a77;
-            color: #8d99ae;
-            font-size: 0.9rem;
-        }
-        
-        .last-update {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 10px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            header {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .scanner-controls, .results-section {
-                padding: 20px;
-            }
-            
-            .controls-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .buttons {
-                flex-direction: column;
-            }
-            
-            .stocks-table {
-                display: block;
-                overflow-x: auto;
-            }
+        .pattern-badge {
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 3px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-chart-line"></i> Stock Market Scanner</h1>
-            <p class="subtitle">Real-time stock screening, technical analysis, and trading signals</p>
-        </header>
-        
-        <div class="alert" id="alertMessage"></div>
-        
-        <div class="scanner-controls">
-            <div class="controls-grid">
-                <div class="control-group">
-                    <label for="marketSelect"><i class="fas fa-globe"></i> Market</label>
-                    <select id="marketSelect">
-                        <option value="nse">NSE (National Stock Exchange)</option>
-                        <option value="bse">BSE (Bombay Stock Exchange)</option>
-                        <option value="nyse">NYSE (New York Stock Exchange)</option>
-                        <option value="nasdaq">NASDAQ</option>
-                    </select>
-                </div>
-                
-                <div class="control-group">
-                    <label for="scanType"><i class="fas fa-filter"></i> Scan Type</label>
-                    <select id="scanType">
-                        <option value="volume">High Volume Stocks</option>
-                        <option value="breakout">Breakout Stocks</option>
-                        <option value="oversold">Oversold Stocks (RSI)</option>
-                        <option value="overbought">Overbought Stocks (RSI)</option>
-                        <option value="gapup">Gap Up Stocks</option>
-                        <option value="gapdown">Gap Down Stocks</option>
-                        <option value="movingavg">Moving Average Crossovers</option>
-                        <option value="momentum">Momentum Stocks</option>
-                    </select>
-                </div>
-                
-                <div class="control-group">
-                    <label for="timeframe"><i class="fas fa-clock"></i> Timeframe</label>
-                    <select id="timeframe">
-                        <option value="1d">1 Day</option>
-                        <option value="5d">5 Days</option>
-                        <option value="1m">1 Month</option>
-                        <option value="3m">3 Months</option>
-                        <option value="6m">6 Months</option>
-                        <option value="1y">1 Year</option>
-                    </select>
-                </div>
-                
-                <div class="control-group">
-                    <label for="minPrice"><i class="fas fa-rupee-sign"></i> Min Price</label>
-                    <input type="number" id="minPrice" placeholder="Minimum price" value="100">
-                </div>
-                
-                <div class="control-group">
-                    <label for="maxPrice"><i class="fas fa-rupee-sign"></i> Max Price</label>
-                    <input type="number" id="maxPrice" placeholder="Maximum price" value="5000">
-                </div>
-                
-                <div class="control-group">
-                    <label for="minVolume"><i class="fas fa-chart-bar"></i> Min Volume (Lakhs)</label>
-                    <input type="number" id="minVolume" placeholder="Minimum volume" value="10">
-                </div>
-            </div>
-            
-            <div class="buttons">
-                <button class="btn btn-scan" id="scanBtn">
-                    <i class="fas fa-search"></i> Scan Stocks
-                </button>
-                <button class="btn btn-clear" id="clearBtn">
-                    <i class="fas fa-broom"></i> Clear Results
-                </button>
-            </div>
+        <div class="header">
+            <h1>📈 Indian Volume Pattern Scanner</h1>
+            <p>Free • Real-time • No API Keys Required</p>
         </div>
         
-        <div class="market-stats" id="marketStats">
-            <div class="stat-card">
-                <div class="stat-value stat-positive" id="niftyValue">22,415.20</div>
-                <div>NIFTY 50 <span class="price-up">+0.85%</span></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value stat-positive" id="sensexValue">73,832.15</div>
-                <div>SENSEX <span class="price-up">+0.78%</span></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value stat-negative" id="advanceDecline">1,254:876</div>
-                <div>Advance/Decline</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value stat-neutral" id="marketSentiment">68.5</div>
-                <div>Market Sentiment</div>
-            </div>
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="scan('quick')">
+                🚀 Quick Scan (All Patterns)
+            </button>
+            <button class="btn" onclick="scan('v_pattern')">V-Pattern</button>
+            <button class="btn" onclick="scan('u_pattern')">U-Pattern</button>
+            <button class="btn" onclick="scan('3plus3')">3+3 Pattern</button>
+            <button class="btn" onclick="scan('pyramid')">Pyramid</button>
+            <button class="btn" onclick="scan('increasing')">Increasing</button>
+            <button class="btn" onclick="scan('decreasing')">Decreasing</button>
         </div>
         
-        <div class="results-section">
-            <div class="results-header">
-                <h2 class="results-title"><i class="fas fa-list-alt"></i> Scan Results</h2>
-                <div class="status-badge" id="statusBadge">Ready</div>
-            </div>
-            
-            <div class="loading" id="loadingIndicator" style="display: none;">
-                <div class="spinner"></div>
-                <p>Scanning stocks based on your criteria...</p>
-                <p id="currentScan">Fetching market data...</p>
-            </div>
-            
-            <div id="resultsTable">
-                <table class="stocks-table">
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Company</th>
-                            <th>Last Price</th>
-                            <th>Change %</th>
-                            <th>Volume</th>
-                            <th>RSI</th>
-                            <th>Signal</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stocksTableBody">
-                        <!-- Stock data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="last-update" id="lastUpdate">
-                Last updated: --:--:--
-            </div>
-        </div>
+        <div class="loader" id="loader"></div>
         
-        <footer>
-            <p>© 2025 Stock Market Scanner | Real-time market analysis tool</p>
-            <p><i class="fas fa-exclamation-triangle"></i> For educational purposes only. Not financial advice.</p>
-        </footer>
+        <div class="results" id="results">
+            <h3>Welcome to Volume Pattern Scanner!</h3>
+            <p>Click any button above to start scanning.</p>
+            <p>Features:</p>
+            <ul>
+                <li>✅ 6 different volume patterns</li>
+                <li>✅ 20+ Indian stocks</li>
+                <li>✅ Real-time Yahoo Finance data</li>
+                <li>✅ 100% Free hosting on Render</li>
+            </ul>
+        </div>
     </div>
 
     <script>
-        // Sample stock data for demonstration
-        const sampleStocks = [
-            { symbol: "RELIANCE", name: "Reliance Industries Ltd", price: 2956.75, change: 1.24, volume: 45.2, rsi: 62.5, signal: "buy" },
-            { symbol: "TCS", name: "Tata Consultancy Services", price: 3875.20, change: -0.45, volume: 23.8, rsi: 42.3, signal: "hold" },
-            { symbol: "HDFCBANK", name: "HDFC Bank Ltd", price: 1685.60, change: 0.78, volume: 38.5, rsi: 58.7, signal: "buy" },
-            { symbol: "INFY", name: "Infosys Ltd", price: 1542.30, change: 1.56, volume: 29.3, rsi: 67.2, signal: "hold" },
-            { symbol: "ICICIBANK", name: "ICICI Bank Ltd", price: 1105.40, change: -1.23, volume: 41.7, rsi: 38.9, signal: "buy" },
-            { symbol: "SBIN", name: "State Bank of India", price: 825.75, change: 2.34, volume: 52.1, rsi: 71.5, signal: "sell" },
-            { symbol: "BHARTIARTL", name: "Bharti Airtel Ltd", price: 1345.80, change: 0.92, volume: 31.6, rsi: 55.4, signal: "buy" },
-            { symbol: "ITC", name: "ITC Ltd", price: 435.25, change: -0.34, volume: 47.8, rsi: 49.2, signal: "hold" },
-            { symbol: "LT", name: "Larsen & Toubro Ltd", price: 3680.50, change: 1.89, volume: 18.9, rsi: 65.8, signal: "hold" },
-            { symbol: "AXISBANK", name: "Axis Bank Ltd", price: 1120.30, change: -0.67, volume: 32.4, rsi: 41.3, signal: "buy" },
-            { symbol: "KOTAKBANK", name: "Kotak Mahindra Bank", price: 1785.90, change: 0.45, volume: 21.7, rsi: 53.6, signal: "hold" },
-            { symbol: "BAJFINANCE", name: "Bajaj Finance Ltd", price: 7250.40, change: -2.15, volume: 12.8, rsi: 32.7, signal: "buy" },
-            { symbol: "ASIANPAINT", name: "Asian Paints Ltd", price: 2985.60, change: 0.23, volume: 9.5, rsi: 59.4, signal: "hold" },
-            { symbol: "HINDUNILVR", name: "Hindustan Unilever Ltd", price: 2450.30, change: -0.89, volume: 14.2, rsi: 46.8, signal: "hold" },
-            { symbol: "WIPRO", name: "Wipro Ltd", price: 485.75, change: 1.45, volume: 36.7, rsi: 63.2, signal: "buy" }
-        ];
-
-        // DOM Elements
-        const scanBtn = document.getElementById('scanBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const stocksTableBody = document.getElementById('stocksTableBody');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const statusBadge = document.getElementById('statusBadge');
-        const alertMessage = document.getElementById('alertMessage');
-        const lastUpdate = document.getElementById('lastUpdate');
-        const currentScan = document.getElementById('currentScan');
-
-        // Event Listeners
-        scanBtn.addEventListener('click', startScan);
-        clearBtn.addEventListener('click', clearResults);
-
-        // Initialize with some data
-        window.addEventListener('load', initializeScanner);
-
-        function showAlert(message, type = 'info') {
-            alertMessage.textContent = message;
-            alertMessage.className = `alert alert-${type}`;
-            alertMessage.style.display = 'block';
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+        
+        async function scan(patternType) {
+            showLoader();
             
-            setTimeout(() => {
-                alertMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-IN', { 
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            lastUpdate.textContent = `Last updated: ${timeString}`;
-        }
-
-        function initializeScanner() {
-            // Display initial data
-            displayStocks(sampleStocks.slice(0, 8));
-            updateLastUpdateTime();
-            showAlert('Stock scanner ready. Click "Scan Stocks" to begin.', 'info');
-        }
-
-        async function startScan() {
-            const market = document.getElementById('marketSelect').value;
-            const scanType = document.getElementById('scanType').value;
-            const timeframe = document.getElementById('timeframe').value;
-            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || 10000;
-            const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
-
-            // Validation
-            if (minPrice >= maxPrice) {
-                showAlert('Minimum price must be less than maximum price', 'info');
-                return;
-            }
-
-            // Update UI
-            scanBtn.disabled = true;
-            scanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
-            statusBadge.textContent = 'Scanning';
-            statusBadge.className = 'status-badge status-scanning';
-            loadingIndicator.style.display = 'block';
-            stocksTableBody.innerHTML = '';
-
-            // Simulate scanning process
             try {
-                await simulateScanProcess(market, scanType, timeframe);
+                const response = await fetch(`/api/scan/${patternType}`);
+                const data = await response.json();
                 
-                // Filter and display results
-                const filteredStocks = filterStocks(sampleStocks, minPrice, maxPrice, minVolume, scanType);
-                displayStocks(filteredStocks);
-                
-                // Update status
-                statusBadge.textContent = 'Complete';
-                statusBadge.className = 'status-badge status-complete';
-                updateLastUpdateTime();
-                showAlert(`Found ${filteredStocks.length} stocks matching your criteria`, 'success');
-                
+                hideLoader();
+                displayResults(data, patternType);
             } catch (error) {
-                console.error('Scan error:', error);
-                statusBadge.textContent = 'Error';
-                statusBadge.className = 'status-badge status-error';
-                showAlert('Scan failed. Please try again.', 'info');
-            } finally {
-                scanBtn.disabled = false;
-                scanBtn.innerHTML = '<i class="fas fa-search"></i> Scan Stocks';
-                loadingIndicator.style.display = 'none';
-            }
-        }
-
-        function filterStocks(stocks, minPrice, maxPrice, minVolume, scanType) {
-            // Apply price and volume filters
-            let filtered = stocks.filter(stock => 
-                stock.price >= minPrice && 
-                stock.price <= maxPrice && 
-                stock.volume >= minVolume
-            );
-
-            // Apply scan type specific filters
-            switch(scanType) {
-                case 'oversold':
-                    filtered = filtered.filter(stock => stock.rsi < 30);
-                    break;
-                case 'overbought':
-                    filtered = filtered.filter(stock => stock.rsi > 70);
-                    break;
-                case 'volume':
-                    filtered.sort((a, b) => b.volume - a.volume);
-                    break;
-                case 'breakout':
-                    filtered = filtered.filter(stock => stock.change > 1.5);
-                    break;
-                case 'gapup':
-                    filtered = filtered.filter(stock => stock.change > 2);
-                    break;
-                case 'gapdown':
-                    filtered = filtered.filter(stock => stock.change < -1.5);
-                    break;
-                case 'momentum':
-                    filtered.sort((a, b) => b.change - a.change);
-                    break;
-            }
-
-            return filtered.slice(0, 15); // Limit to 15 results
-        }
-
-        async function simulateScanProcess(market, scanType, timeframe) {
-            const scanMessages = [
-                `Scanning ${market.toUpperCase()} for ${scanType} patterns...`,
-                'Analyzing price movements...',
-                'Calculating technical indicators...',
-                'Filtering stocks based on criteria...',
-                'Generating trading signals...'
-            ];
-
-            for (let i = 0; i < scanMessages.length; i++) {
-                currentScan.textContent = scanMessages[i];
-                await new Promise(resolve => setTimeout(resolve, 800));
-            }
-        }
-
-        function displayStocks(stocks) {
-            if (stocks.length === 0) {
-                stocksTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; padding: 30px; color: #8d99ae;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                            No stocks found matching your criteria. Try adjusting your filters.
-                        </td>
-                    </tr>
+                hideLoader();
+                document.getElementById('results').innerHTML = `
+                    <div style="color: red; padding: 20px; text-align: center;">
+                        <h4>⚠️ Error Scanning</h4>
+                        <p>Please try again. If this continues, wait 1 minute and refresh.</p>
+                        <p><small>Render free tier sleeps after 15 minutes</small></p>
+                    </div>
                 `;
-                return;
             }
-
-            let html = '';
-            stocks.forEach(stock => {
-                const changeClass = stock.change > 0 ? 'price-up' : stock.change < 0 ? 'price-down' : 'price-neutral';
-                const signalClass = `signal-${stock.signal}`;
-                const signalText = stock.signal.toUpperCase();
-                
-                html += `
-                    <tr>
-                        <td><span class="stock-symbol">${stock.symbol}</span></td>
-                        <td><span class="stock-name">${stock.name}</span></td>
-                        <td>₹${stock.price.toFixed(2)}</td>
-                        <td class="${changeClass}">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</td>
-                        <td>${stock.volume.toFixed(1)}L</td>
-                        <td>${stock.rsi.toFixed(1)}</td>
-                        <td><span class="${signalClass}">${signalText}</span></td>
-                        <td>
-                            <button class="btn-action" onclick="viewStockDetails('${stock.symbol}')" style="background: #1b4965; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9rem;">
-                                <i class="fas fa-chart-bar"></i> Analyze
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            stocksTableBody.innerHTML = html;
         }
-
-        function clearResults() {
-            stocksTableBody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 30px; color: #8d99ae;">
-                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                        Results cleared. Click "Scan Stocks" to begin.
-                    </td>
-                </tr>
-            `;
-            statusBadge.textContent = 'Ready';
-            statusBadge.className = 'status-badge';
+        
+        function displayResults(data, patternType) {
+            let html = `<h3>Scan Results (${patternType})</h3>`;
             
-            // Reset form values
-            document.getElementById('marketSelect').value = 'nse';
-            document.getElementById('scanType').value = 'volume';
-            document.getElementById('timeframe').value = '1d';
-            document.getElementById('minPrice').value = '100';
-            document.getElementById('maxPrice').value = '5000';
-            document.getElementById('minVolume').value = '10';
+            if (!data || data.length === 0) {
+                html += `<p>No patterns found. Try another scan.</p>`;
+            } else if (patternType === 'quick') {
+                html += `<p>Found ${data.length} stocks with patterns:</p>`;
+                data.forEach(stock => {
+                    html += `
+                        <div class="stock-item">
+                            <h4>${stock.symbol} - ₹${stock.price}</h4>
+                            <div>${stock.patterns.map(p => 
+                                `<span class="pattern-badge">${p}</span>`
+                            ).join(' ')}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<p>Found ${data.length} patterns:</p>`;
+                data.forEach(item => {
+                    html += `
+                        <div class="stock-item">
+                            <h4>${item.symbol} - ${item.pattern}</h4>
+                            <p>Price: ₹${item.price} | Volume: ${item.volume.toLocaleString()}</p>
+                        </div>
+                    `;
+                });
+            }
             
-            showAlert('Scanner reset successfully', 'success');
+            document.getElementById('results').innerHTML = html;
         }
-
-        // Function to simulate viewing stock details
-        function viewStockDetails(symbol) {
-            showAlert(`Loading detailed analysis for ${symbol}...`, 'info');
-            
-            // In a real application, this would navigate to a detailed analysis page
-            // or fetch more data about the specific stock
-            setTimeout(() => {
-                showAlert(`Detailed analysis would show for ${symbol} in a real application`, 'info');
-            }, 1000);
-        }
-
-        // Simulate live market data updates
-        function updateMarketData() {
-            // Randomly update market indices
-            const niftyChange = (Math.random() - 0.5) * 0.3;
-            const sensexChange = (Math.random() - 0.5) * 0.25;
-            
-            const niftyElement = document.getElementById('niftyValue');
-            const sensexElement = document.getElementById('sensexValue');
-            
-            // Update with random variations
-            const currentNifty = parseFloat(niftyElement.textContent.replace(/,/g, ''));
-            const currentSensex = parseFloat(sensexElement.textContent.replace(/,/g, ''));
-            
-            const newNifty = currentNifty * (1 + niftyChange/100);
-            const newSensex = currentSensex * (1 + sensexChange/100);
-            
-            niftyElement.textContent = newNifty.toFixed(2);
-            sensexElement.textContent = newSensex.toFixed(2);
-            
-            // Update advance/decline ratio
-            const advances = Math.floor(Math.random() * 500) + 1000;
-            const declines = Math.floor(Math.random() * 500) + 700;
-            document.getElementById('advanceDecline').textContent = `${advances}:${declines}`;
-            
-            // Update market sentiment
-            const sentiment = Math.floor(Math.random() * 40) + 50;
-            document.getElementById('marketSentiment').textContent = `${sentiment.toFixed(1)}`;
-        }
-
-        // Update market data every 30 seconds
-        setInterval(updateMarketData, 30000);
+        
+        // Check if server is running
+        window.onload = async () => {
+            try {
+                await fetch('/api/status');
+            } catch {
+                console.log('App starting...');
+            }
+        };
     </script>
 </body>
 </html>
